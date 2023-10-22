@@ -32,6 +32,7 @@ day_care_center.csv : 서울/부산 지역의 어린이집에 대한 정보
 ![](https://velog.velcdn.com/images/seonydg/post/5fd6a6a0-b3b9-45bb-ad0b-3ec47089ebdd/image.png)
 
 
+
 # 데이터 탐색 및 전처리
 ## 1. 변수 추가
 train 데이터에는 '구' 정보가 없고, 어린이집 데이터에는 '동' 정보가 없어 병합할 때 문제가 될 수 있으다.
@@ -75,11 +76,13 @@ df = pd.merge(df, ref_df, left_on=['city', 'dong'], right_on=['시도', '법정�
 df.drop(['시도', '법정동'], axis=1, inplace=True)
 ```
 
+
 ## 2. 중복 및 불필요한 변수 제거
 ```
 # 거래 id는 불필요하다 판단, addr은 중복으로 제거
 df.drop(['transaction_id', 'addr_kr'], axis=1, inplace=True)
 ```
+
 
 ## 3. 변수 탐색
 문자로 되어 있는 변수를 수치형으로 변환(서울 : 1, 부산: 0)
@@ -136,6 +139,7 @@ df.drop('transaction_year_month', axis=1, inplace=True)
 
 이렇게 5의 범주형 변수로 나누고 층 컬럼은 삭제하도록 한다. 
 
+
 ## 4. 시세 변수 추가
 시세는 해당 아파트가 위치하는 지리적 위치에 영향을 많이 받을 것이라 판단이 된다.
 그리고 아파트 브렌드(시공사)에 따라서도 시세가 영향을 많이 받을 것이라 판단되기에 '구'별, 브렌드(아파트 id)별 평균 시세를 추가하기로 한다.
@@ -162,6 +166,7 @@ price_per_aid.rename({'transaction_real_price':'아파트별_평균가격'}, axi
 
 df = pd.merge(df, price_per_aid, on=['apartment_id'])
 ```
+
 
 ## 5. 공원 데이터 병합
 아파트가 속한 지역 주변에 공원의 유무가 시세에 영향을 끼치는지(제공된 데이터이고 공원의 유무는 유의미한 변수가 될 것이라 판단(추가로 공원 외에도 편의시설 유무가 근처에 있는지 확인해 보는 것도 유의미할 것 같다))
@@ -245,6 +250,7 @@ df.drop('gu', axis=1, inplace=True)
 - 특징 선택 : 5, 10, 15, 20개 선택
 - 통계량 : 상호 정보량 / 'mulual_info_regression'사용 - 변수가 연속/범주형이고 라벨이 회귀 문제
 
+
 ## 1. 데이터 분리
 기존 데이터를 데이터와 라벨로 분할한다.
 라벨에는 시세를, 데이터는 라벨을 포함하여 불필요한 변수들을 제거한다.
@@ -258,6 +264,7 @@ Y = df['transaction_real_price']
 from sklearn.model_selection import train_test_split
 Train_X, Test_X, Train_Y, Test_Y = train_test_split(X, Y) # default 0.25%
 ```
+
 
 ## 2. 모델
 트리 기반의 모델들은 스케일에 영향을 받지 않는 모델이라 스케일링은 제외시켰다.
@@ -350,6 +357,7 @@ for k in range(20, 4, -5):
 
             print(f'iter num: {iteration_num}/{max_iter_num}, score: {score:.3f}, best score: {best_score:.3f}')
 ```
+
 
 ## 3. 최종 모델 선정
 학습/평가로 나눈 데이터를 다시 합쳐서 best 모델로 선정된 모델로 재학습 후, 새로운 데이터(모델 평가용 데이터 : test.csv)에 대한 결과를 도출한다.
